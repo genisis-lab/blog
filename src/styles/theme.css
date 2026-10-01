@@ -26,16 +26,16 @@
 
 :root {
 	color-scheme: light;
-	--color-bg: #faf8f4;
-	--color-bg-subtle: #f3efe8;
+	--color-bg: #f8fafc;
+	--color-bg-subtle: #f1f5f9;
 	--color-surface: #ffffff;
-	--color-text: #282420;
-	--color-text-secondary: #625b53;
-	--color-muted: #756b61;
-	--color-border: #dcd4c9;
-	--color-border-subtle: #e8e1d7;
-	--color-brand: #8d4e2e;
-	--color-brand-hover: #66361f;
+	--color-text: #0f172a;
+	--color-text-secondary: #475569;
+	--color-muted: #64748b;
+	--color-border: #cbd5e1;
+	--color-border-subtle: #e2e8f0;
+	--color-brand: #0f766e;
+	--color-brand-hover: #115e59;
 	--color-on-brand: #ffffff;
 	--radius: 6px;
 	--radius-lg: 12px;
@@ -46,32 +46,32 @@
 @media (prefers-color-scheme: dark) {
 	:root:not(.light) {
 		color-scheme: dark;
-		--color-bg: #181715;
-		--color-bg-subtle: #201e1b;
-		--color-surface: #24211e;
-		--color-text: #f1ece4;
-		--color-text-secondary: #c3b9ab;
-		--color-muted: #aaa092;
-		--color-border: #494238;
-		--color-border-subtle: #36312b;
-		--color-brand: #d2a274;
-		--color-brand-hover: #e6bd97;
-		--color-on-brand: #201a15;
+		--color-bg: #0f172a;
+		--color-bg-subtle: #162033;
+		--color-surface: #1e293b;
+		--color-text: #f1f5f9;
+		--color-text-secondary: #cbd5e1;
+		--color-muted: #94a3b8;
+		--color-border: #475569;
+		--color-border-subtle: #334155;
+		--color-brand: #5eead4;
+		--color-brand-hover: #99f6e4;
+		--color-on-brand: #0f172a;
 	}
 }
 :root.dark {
 	color-scheme: dark;
-	--color-bg: #181715;
-	--color-bg-subtle: #201e1b;
-	--color-surface: #24211e;
-	--color-text: #f1ece4;
-	--color-text-secondary: #c3b9ab;
-	--color-muted: #aaa092;
-	--color-border: #494238;
-	--color-border-subtle: #36312b;
-	--color-brand: #d2a274;
-	--color-brand-hover: #e6bd97;
-	--color-on-brand: #201a15;
+	--color-bg: #0f172a;
+	--color-bg-subtle: #162033;
+	--color-surface: #1e293b;
+	--color-text: #f1f5f9;
+	--color-text-secondary: #cbd5e1;
+	--color-muted: #94a3b8;
+	--color-border: #475569;
+	--color-border-subtle: #334155;
+	--color-brand: #5eead4;
+	--color-brand-hover: #99f6e4;
+	--color-on-brand: #0f172a;
 }
 
 :root .site-header { background: var(--color-bg); }
@@ -130,3 +130,9 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--color-brand); o
 .contact-page button:disabled { opacity: 0.6; cursor: wait; }
 .contact-page input.contact-honeypot { display: none; }
 .contact-page .contact-status { min-height: 1.5em; }
+
+/* Swap only this logo variant; later CMS logo choices keep their own image. */
+:root.dark .site-logo-img[src*="01M3VZCBSRHMWS9226XHY4TZ6G.png"], :root.dark .footer-logo-img[src*="01M3VZCBSRHMWS9226XHY4TZ6G.png"] { content: url("/_emdash/api/media/file/01M3VZCCY33J5H6M0QNY2ZHNFJ.png"); }
+@media (prefers-color-scheme: dark) {
+ :root:not(.light) .site-logo-img[src*="01M3VZCBSRHMWS9226XHY4TZ6G.png"], :root:not(.light) .footer-logo-img[src*="01M3VZCBSRHMWS9226XHY4TZ6G.png"] { content: url("/_emdash/api/media/file/01M3VZCCY33J5H6M0QNY2ZHNFJ.png"); }
+}
