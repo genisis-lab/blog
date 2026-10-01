@@ -45,7 +45,9 @@ Astro.response.headers.set("Cache-Control", "no-store");
 					method: "POST", headers: { Accept: "application/json" }, body: new FormData(form),
 				});
 				const result = await response.json();
-				if (!response.ok || !result.ok || (result.status !== "already_confirmed" && !result.emailSent)) throw new Error("Signup failed");
+			if (!response.ok || typeof result !== "object" || result === null
+				|| !("ok" in result) || result.ok !== true || !("status" in result)
+				|| (result.status !== "already_confirmed" && (!("emailSent" in result) || result.emailSent !== true))) throw new Error("Signup failed");
 				status.textContent = result.status === "already_confirmed" ? form.dataset.confirmed! : form.dataset.success!;
 				form.reset();
 			} catch { status.textContent = form.dataset.error!; }
