@@ -1,7 +1,12 @@
 ---
+import { blogLocale, localizePath, uiText } from "../../utils/i18n";
 import { getEmDashCollection, getTermsForEntries } from "emdash";
 import Base from "../../layouts/Base.astro";
 import { getReadingTime } from "../../utils/reading-time";
+
+const locale = blogLocale(Astro.currentLocale);
+const localized = (path: string) => localizePath(path, locale);
+const t = (en: string, es: string) => uiText(locale, en, es);
 
 // Sort in the database rather than in JS — lets the DB use its index on
 // published_at and avoids a full-table scan on the client.
@@ -11,6 +16,7 @@ const {
 	cacheHint,
 	nextCursor,
 } = await getEmDashCollection("posts", {
+	locale,
 	orderBy: { published_at: "desc" },
 	limit: 20,
 	cursor,
@@ -34,31 +40,31 @@ const postsWithTags = posts.map((post) => ({
 }));
 
 const formatDate = (date: Date) =>
-	date.toLocaleDateString("en-US", {
+	date.toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
 	});
 ---
 
-<Base title="All Posts" description="Browse all blog posts">
+<Base title={t("All Posts", "Todas las publicaciones")} description={t("Browse all blog posts", "Explora todas las publicaciones")}>
 	<div class="posts-page">
 		<header class="page-header">
-			<h1 class="page-title">All Posts</h1>
+			<h1 class="page-title">{t("All Posts", "Todas las publicaciones")}</h1>
 			<p class="page-description">
 				{posts.length}{" "}
-				{posts.length === 1 ? "article" : "articles"}
+				{posts.length === 1 ? t("article", "artículo") : t("articles", "artículos")}
 			</p>
 		</header>
 
 		{
 			posts.length === 0 ? (
-				<p class="empty">No posts yet.</p>
+				<p class="empty">{t("No posts yet.", "No hay publicaciones en español todavía.")}</p>
 			) : (
 				<div class="posts-list">
 					{postsWithTags.map(({ post, tags, bylines }) => (
 						<article class="post-item">
-							<a href={`/posts/${post.id}`} class="post-link">
+							<a href={localized(`/posts/${post.id}`)} class="post-link">
 								<div class="post-meta">
 									{bylines.length > 0 && (
 										<>
@@ -91,7 +97,7 @@ const formatDate = (date: Date) =>
 										<time>{formatDate(post.data.publishedAt)}</time>
 									)}
 									{post.data.publishedAt && <span class="meta-dot" />}
-									<span>{getReadingTime(post.data.content)} min read</span>
+									<span>{getReadingTime(post.data.content)} {t("min read", "min de lectura")}</span>
 								</div>
 								<h2 class="post-title" {...post.edit.title}>{post.data.title}</h2>
 								{post.data.excerpt && (
@@ -101,7 +107,7 @@ const formatDate = (date: Date) =>
 							{tags.length > 0 && (
 								<div class="post-tags">
 									{tags.slice(0, 3).map((t) => (
-										<a href={`/tag/${t.slug}`} class="post-tag">
+										<a href={localized(`/tag/${t.slug}`)} class="post-tag">
 											{t.label}
 										</a>
 									))}
@@ -113,11 +119,11 @@ const formatDate = (date: Date) =>
 			)
 		}
 		<nav class="pagination" aria-label="Pagination">
-			{cursor && <a href="/posts">First page</a>}
+			{cursor && <a href={localized("/posts")}>{t("First page", "Primera página")}</a>}
 			{
 				nextCursor && (
-					<a href={`/posts?cursor=${encodeURIComponent(nextCursor)}`}>
-						Next page
+					<a href={localized(`/posts?cursor=${encodeURIComponent(nextCursor)}`)}>
+						{t("Next page", "Página siguiente")}
 					</a>
 				)
 			}

@@ -31,3 +31,8 @@
 .nav-admin {
 	margin-inline-start: var(--spacing-5);
 }
+
+/* Language navigation and translation fallback notice. */
+.language-switcher { display: flex; flex-wrap: wrap; gap: 0.65rem; font-size: var(--font-size-sm); }
+.language-switcher a[aria-current="page"] { font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; }
+.translation-notice { max-width: var(--wide-width); margin: var(--spacing-6) auto; padding: 0 var(--spacing-6); color: var(--color-muted); }

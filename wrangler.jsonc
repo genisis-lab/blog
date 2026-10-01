@@ -19,6 +19,9 @@
 			"bucket_name": "my-emdash-media","preview_bucket_name": "my-emdash-media",
 		},
 	],
+	"kv_namespaces": [
+		{ "binding": "CACHE", "id": "de926f9bc18443ecad2630e57e6daa40" },
+	],
 	// Run registry plugins in isolated Dynamic Workers.
 	"worker_loaders": [{ "binding": "LOADER" }],
 	// General maintenance cron trigger

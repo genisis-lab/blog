@@ -1,0 +1,22 @@
+---
+import { getTranslations } from "emdash";
+import { blogLocale, localizePath } from "../utils/i18n";
+
+interface Props { content?: { collection: string; id: string; slug?: string | null }; }
+const { content } = Astro.props;
+const locale = blogLocale(Astro.currentLocale);
+const pathname = Astro.url.pathname.replace(/^\/es(?=\/|$)/, "") || "/";
+const genericPage = /^(\/|\/posts\/?|\/search\/?)$/.test(pathname);
+const variants = content ? (await getTranslations(content.collection, content.id)).translations : [];
+const links = (["en", "es"] as const).map((language) => {
+	const translation = variants.find((item) => item.locale === language && item.status === "published" && item.slug);
+	// Missing or unpublished translations lead to the language's home page.
+	const path = translation ? `/${content!.collection}/${translation.slug}` : genericPage ? pathname : "/";
+	return { language, href: localizePath(path, language), label: language === "es" ? "Español" : "English" };
+});
+---
+<div class="language-switcher" aria-label={locale === "es" ? "Idioma" : "Language"}>
+	{links.map(({ language, href, label }) => (
+		<a href={href} lang={language} aria-current={language === locale ? "page" : undefined}>{label}</a>
+	))}
+</div>

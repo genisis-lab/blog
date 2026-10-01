@@ -1,4 +1,5 @@
 ---
+import { blogLocale, localizePath, uiText } from "../../utils/i18n";
 import {
 	getEmDashEntry,
 	getSeoMeta,
@@ -9,13 +10,17 @@ import { PortableText } from "emdash/ui";
 import Base from "../../layouts/Base.astro";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 
+const locale = blogLocale(Astro.currentLocale);
+const localized = (path: string) => localizePath(path, locale);
+const t = (en: string, es: string) => uiText(locale, en, es);
+
 const slug = decodeSlug(Astro.params.slug);
 
 if (!slug) {
 	return Astro.redirect("/404");
 }
 
-const { entry: page, cacheHint } = await getEmDashEntry("pages", slug);
+const { entry: page, cacheHint, fallbackLocale } = await getEmDashEntry("pages", slug, { locale });
 
 if (!page) {
 	return Astro.redirect("/404");
@@ -38,7 +43,8 @@ const seo = getSeoMeta(page, {
 	robots={seo.robots}
 	content={{ collection: "pages", id: page.data.id, slug }}
 >
-	<article class="page-article">
+	{fallbackLocale && <p class="translation-notice">{t("This translation is unavailable. Showing the English version.", "Esta traducción aún no está disponible. Se muestra la versión en inglés.")}</p>}
+	<article lang={fallbackLocale ?? locale} class="page-article">
 		<header class="page-header">
 			<h1 class="page-title" {...page.edit.title}>{page.data.title}</h1>
 		</header>
