@@ -6,7 +6,7 @@ interface Props { content?: { collection: string; id: string; slug?: string | nu
 const { content } = Astro.props;
 const locale = blogLocale(Astro.currentLocale);
 const pathname = Astro.url.pathname.replace(/^\/es(?=\/|$)/, "") || "/";
-const genericPage = /^(\/|\/posts\/?|\/search\/?)$/.test(pathname);
+const genericPage = /^(\/|\/posts\/?|\/search\/?|\/contact\/?)$/.test(pathname);
 const variants = content ? (await getTranslations(content.collection, content.id)).translations : [];
 const links = (["en", "es"] as const).map((language) => {
 	const translation = variants.find((item) => item.locale === language && item.status === "published" && item.slug);

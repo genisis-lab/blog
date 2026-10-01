@@ -6,7 +6,7 @@ export function blogLocale(locale: string | undefined): "en" | "es" {
 export function localizePath(path: string, locale: string): string {
 	if (locale !== "es" || !path.startsWith("/") || path.startsWith("//")) return path;
 	if (path === "/") return "/es/";
-	if (/^\/(posts|pages|category|tag|search)(\/|\?|#|$)/.test(path)) return `/es${path}`;
+	if (/^\/(posts|pages|category|tag|search|contact)(\/|\?|#|$)/.test(path)) return `/es${path}`;
 	return path;
 }
 
