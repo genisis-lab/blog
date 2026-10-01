@@ -27,6 +27,7 @@ export default defineConfig({
 						["/es/tag/[slug]", "tag/[slug].astro"],
 						["/es/search", "search.astro"],
 						["/es/contact", "contact.astro"],
+						["/es/newsletter", "newsletter.astro"],
 					]) injectRoute({ pattern, entrypoint: `./src/pages/${page}`, prerender: false });
 				},
 			},

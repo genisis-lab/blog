@@ -1,0 +1,58 @@
+---
+import { getPluginSettings } from "emdash";
+import Base from "../layouts/Base.astro";
+import { blogLocale, uiText } from "../utils/i18n";
+const locale = blogLocale(Astro.currentLocale);
+const t = (en: string, es: string) => uiText(locale, en, es);
+let ready = false;
+try {
+	// Secrets stay on the server. Render only whether email setup is complete.
+	const settings = await getPluginSettings("r_w7bflj54ux44d3j4");
+	ready = typeof settings.apiKey === "string" && !!settings.apiKey.trim()
+		&& typeof settings.from === "string" && !!settings.from.trim();
+} catch { ready = false; }
+// The form must reflect credential changes without HTML cache reuse.
+Astro.response.headers.set("Cache-Control", "no-store");
+---
+<Base title={t("Newsletter", "Boletín")}>
+	<section class="contact-page">
+		<h1>{t("Newsletter", "Boletín")}</h1>
+		{ready ? (
+			<form id="newsletter-form" action="/_emdash/api/plugins/r_nqufahfpg3jo7lbq/subscribe" method="post"
+				data-error={t("Your signup could not be completed. Please try again later.", "No se pudo completar tu suscripción. Inténtalo de nuevo más tarde.")}
+				data-success={t("Check your email and confirm your subscription.", "Revisa tu correo y confirma tu suscripción.")}
+				data-confirmed={t("You are already subscribed.", "Ya estás suscrito.")}>
+				<p>{t("Receive new posts by email. Confirm your address to subscribe; every newsletter includes an unsubscribe link.", "Recibe nuevas publicaciones por correo. Confirma tu dirección para suscribirte; cada boletín incluye un enlace para cancelar la suscripción.")}</p>
+				<label for="newsletter-email">{t("Email", "Correo electrónico")}</label>
+				<input id="newsletter-email" name="email" type="email" autocomplete="email" maxlength="254" required />
+				<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="contact-honeypot" />
+				<input type="hidden" name="source" value="newsletter-page" />
+				<button type="submit">{t("Subscribe", "Suscribirse")}</button>
+				<p class="contact-status" role="status" aria-live="polite"></p>
+			</form>
+		) : <p>{t("Newsletter signup will be available once email setup is complete.", "La suscripción al boletín estará disponible cuando se complete la configuración del correo.")}</p>}
+	</section>
+</Base>
+<script>
+	const form = document.querySelector<HTMLFormElement>("#newsletter-form");
+	if (form) {
+		const button = form.querySelector<HTMLButtonElement>("button")!;
+		const status = form.querySelector<HTMLElement>(".contact-status")!;
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			if (!form.reportValidity() || button.disabled) return;
+			button.disabled = true;
+			status.textContent = "";
+			try {
+				const response = await fetch(form.action, {
+					method: "POST", headers: { Accept: "application/json" }, body: new FormData(form),
+				});
+				const result = await response.json();
+				if (!response.ok || !result.ok || (result.status !== "already_confirmed" && !result.emailSent)) throw new Error("Signup failed");
+				status.textContent = result.status === "already_confirmed" ? form.dataset.confirmed! : form.dataset.success!;
+				form.reset();
+			} catch { status.textContent = form.dataset.error!; }
+			finally { button.disabled = false; }
+		});
+	}
+</script>
