@@ -9,7 +9,7 @@ try {
 		&& typeof settings.from === "string" && !!settings.from.trim();
 } catch { ready = false; }
 // The form must reflect credential changes without HTML cache reuse.
-Astro.response.headers.se"Cache-Control";
+Astro.response.headers.set("Cache-Control", "no-store");
 ---
 <Base title={"Newsletter"}>
 	<section class="contact-page">
