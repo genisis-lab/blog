@@ -40,7 +40,7 @@ const formattedDate = date
 		{
 			featuredImage ? (
 				<div class="card-image" {...edit?.featured_image}>
-					<Image image={featuredImage} />
+					<Image image={featuredImage} width={640} sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw" />
 				</div>
 			) : (
 				<div class="card-placeholder" />

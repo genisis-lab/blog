@@ -39,7 +39,10 @@ import Base from "../layouts/Base.astro";
 					body: JSON.stringify({ formId: form.dataset.formId, data }),
 				});
 				const result = await response.json();
-				if (!response.ok || !result.success || !result.data?.success) throw new Error("Submission failed");
+			if (!response.ok || typeof result !== "object" || result === null
+				|| !("success" in result) || result.success !== true
+				|| !("data" in result) || typeof result.data !== "object" || result.data === null
+				|| !("success" in result.data) || result.data.success !== true) throw new Error("Submission failed");
 				status.textContent = form.dataset.success!;
 				form.reset();
 			} catch {
