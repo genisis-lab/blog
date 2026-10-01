@@ -1,5 +1,4 @@
 ---
-import { blogLocale, localizePath, uiText } from "../utils/i18n";
 import {
 	getEmDashCollection,
 	getTermsForEntries,
@@ -11,17 +10,12 @@ import PostCard from "../components/PostCard.astro";
 import { getReadingTime } from "../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../utils/site-identity";
 
-const locale = blogLocale(Astro.currentLocale);
-const localized = (path: string) => localizePath(path, locale);
-const t = (en: string, es: string) => uiText(locale, en, es);
-
 // Limit to what we render (1 featured + 6 grid). The DB does the slicing
 // instead of fetching every post and discarding the tail in JS.
 const POSTS_PER_PAGE = 7;
 
 const [{ entries: posts, cacheHint }, settings] = await Promise.all([
 	getEmDashCollection("posts", {
-	locale,
 		orderBy: { published_at: "desc" },
 		limit: POSTS_PER_PAGE + 1, // +1 to detect "view all" need
 	}),
@@ -73,7 +67,7 @@ const gridPostsWithTags = gridPosts.map((post) => ({
 // Format date helper
 function formatDate(date: Date | null | undefined) {
 	if (!date) return null;
-	return date.toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
+	return date.toLocaleDateString("en-US", {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
@@ -85,10 +79,10 @@ function formatDate(date: Date | null | undefined) {
 	{
 		posts.length === 0 ? (
 			<section class="empty-state">
-				<h1>{t("No posts yet", "No hay publicaciones en español todavía")}</h1>
-				<p>{t("Create your first post in the admin panel.", "Las publicaciones en español aparecerán aquí cuando se publiquen.")}</p>
-				<a href={locale === "es" ? "/posts" : "/_emdash/admin/content/posts/new"} class="btn">
-					{t("Create a post", "Leer publicaciones en inglés")}
+				<h1>No posts yet</h1>
+				<p>Create your first post in the admin panel.</p>
+				<a href="/_emdash/admin/content/posts/new" class="btn">
+					Create a post
 				</a>
 			</section>
 		) : (
@@ -97,7 +91,7 @@ function formatDate(date: Date | null | undefined) {
 				{featuredPost && (
 					<section class="featured-section">
 						<div class="featured-grid">
-							<a href={localized(`/posts/${featuredPost.id}`)} class="featured-image-link">
+							<a href={`/posts/${featuredPost.id}`} class="featured-image-link">
 								<div class="featured-image" {...featuredPost.edit.featured_image}>
 									<Image image={featuredPost.data.featured_image} />
 								</div>
@@ -138,11 +132,11 @@ function formatDate(date: Date | null | undefined) {
 									)}
 									<span class="meta-dot" />
 									<span>
-										{getReadingTime(featuredPost.data.content)} {t("min read", "min de lectura")}
+										{getReadingTime(featuredPost.data.content)} min read
 									</span>
 								</div>
 								<a
-									href={localized(`/posts/${featuredPost.id}`)}
+									href={`/posts/${featuredPost.id}`}
 									class="featured-title-link"
 								>
 									<h1 class="featured-title" {...featuredPost.edit.title}>{featuredPost.data.title}</h1>
@@ -153,7 +147,7 @@ function formatDate(date: Date | null | undefined) {
 								{featuredTags.length > 0 && (
 									<div class="featured-tags">
 										{featuredTags.map((tag) => (
-											<a href={localized(`/tag/${tag.slug}`)} class="featured-tag">
+											<a href={`/tag/${tag.slug}`} class="featured-tag">
 												{tag.label}
 											</a>
 										))}
@@ -168,10 +162,10 @@ function formatDate(date: Date | null | undefined) {
 				{gridPostsWithTags.length > 0 && (
 					<section class="posts-section">
 						<header class="section-header">
-							<h2 class="section-title">{t("Latest", "Lo más reciente")}</h2>
+							<h2 class="section-title">Latest</h2>
 							{hasMorePosts && (
-								<a href={localized("/posts")} class="section-link">
-									{t("View all", "Ver todo")}
+								<a href="/posts" class="section-link">
+									View all
 								</a>
 							)}
 						</header>
@@ -181,7 +175,7 @@ function formatDate(date: Date | null | undefined) {
 									title={post.data.title ?? "Untitled"}
 									excerpt={post.data.excerpt}
 									featuredImage={post.data.featured_image}
-									href={localized(`/posts/${post.id}`)}
+									href={`/posts/${post.id}`}
 									date={post.data.publishedAt ?? undefined}
 									readingTime={getReadingTime(post.data.content)}
 									tags={tags}

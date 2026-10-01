@@ -1,13 +1,8 @@
 ---
-import { blogLocale, localizePath, uiText } from "../utils/i18n";
 export const prerender = false;
 
 import { search } from "emdash";
 import Base from "../layouts/Base.astro";
-
-const locale = blogLocale(Astro.currentLocale);
-const localized = (path: string) => localizePath(path, locale);
-const t = (en: string, es: string) => uiText(locale, en, es);
 
 const query = Astro.url.searchParams.get("q")?.trim() || "";
 
@@ -16,39 +11,39 @@ const query = Astro.url.searchParams.get("q")?.trim() || "";
 // results, and handles tokenization/stemming. Templates that grep all
 // post bodies in JS quickly become unusable past a few hundred posts.
 const { items: results } = query
-	? await search(query, { collections: ["posts"], locale, limit: 30 })
+	? await search(query, { collections: ["posts"], limit: 30 })
 	: { items: [] };
 ---
 
 <Base
-	title={query ? `${t("Search", "Buscar")}: ${query}` : t("Search", "Buscar")}
-	description={t("Search blog posts", "Buscar publicaciones")}
+	title={query ? `Search: ${query}` : "Search"}
+	description="Search blog posts"
 >
 	<section class="search-page">
-		<h1 class="search-title">{t("Search", "Buscar")}</h1>
+		<h1 class="search-title">Search</h1>
 
-		<form method="get" action={localized("/search")} class="search-form">
+		<form method="get" action="/search" class="search-form">
 			<label for="site-search-query" class="visually-hidden"
-				>{t("Search blog posts", "Buscar publicaciones")}</label
+				>Search blog posts</label
 			>
 			<input
 				id="site-search-query"
 				type="search"
 				name="q"
 				value={query}
-				placeholder={t("Search posts...", "Buscar publicaciones...")}
+				placeholder="Search posts..."
 				class="search-input"
 				autofocus
 			/>
-			<button type="submit" class="search-button">{t("Search", "Buscar")}</button>
+			<button type="submit" class="search-button">Search</button>
 		</form>
 
 		{
 			query && (
 				<p class="search-summary">
 					{results.length === 0
-						? `${t("No results for", "Sin resultados para")} "${query}"`
-						: `${results.length} ${t("result", "resultado")}${results.length === 1 ? "" : "s"} ${t("for", "para")} "${query}"`}
+						? `No results for "${query}"`
+						: `${results.length} result${results.length === 1 ? "" : "s"} for "${query}"`}
 				</p>
 			)
 		}
@@ -59,7 +54,7 @@ const { items: results } = query
 					{results.map((result) => (
 						<li class="search-result">
 							<a
-								href={localized(`/posts/${result.slug ?? result.id}`)}
+								href={`/posts/${result.slug ?? result.id}`}
 								class="result-link"
 							>
 								<h2 class="result-title">{result.title ?? "Untitled"}</h2>
@@ -73,7 +68,7 @@ const { items: results } = query
 			)
 		}
 
-		{!query && <p class="search-hint">{t("Enter a search term to find posts.", "Introduce un término para buscar publicaciones.")}</p>}
+		{!query && <p class="search-hint">Enter a search term to find posts.</p>}
 	</section>
 </Base>
 

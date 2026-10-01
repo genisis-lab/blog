@@ -1,5 +1,4 @@
 ---
-import { blogLocale, localizePath, uiText } from "../../utils/i18n";
 import {
 	getTaxonomyTermsWithCacheHint,
 	getEmDashCollection,
@@ -10,14 +9,9 @@ import Base from "../../layouts/Base.astro";
 import PostCard from "../../components/PostCard.astro";
 import { getReadingTime } from "../../utils/reading-time";
 
-const locale = blogLocale(Astro.currentLocale);
-const localized = (path: string) => localizePath(path, locale);
-const t = (en: string, es: string) => uiText(locale, en, es);
-
 const slug = decodeSlug(Astro.params.slug);
 const termsResult = await getTaxonomyTermsWithCacheHint("category", {
 	includeCounts: false,
-	locale,
 });
 const term = slug ? termsResult.data.find((item) => item.slug === slug) : null;
 
@@ -31,7 +25,6 @@ const {
 	cacheHint,
 	nextCursor,
 } = await getEmDashCollection("posts", {
-	locale,
 	where: { category: term.slug },
 	orderBy: { published_at: "desc" },
 	limit: 20,
@@ -60,13 +53,13 @@ const filteredPosts = posts.map((post) => ({
 <Base title={`${term.label} posts`} description={`All posts in ${term.label}`}>
 	<section class="archive-section">
 		<header class="archive-header">
-			<span class="archive-label">{t("Category", "Categoría")}</span>
+			<span class="archive-label">Category</span>
 			<h1 class="archive-title">{term.label}</h1>
 		</header>
 
 		{
 			filteredPosts.length === 0 ? (
-				<p class="no-posts">{t("No posts in this category yet.", "Aún no hay publicaciones en esta categoría.")}</p>
+				<p class="no-posts">No posts in this category yet.</p>
 			) : (
 				<div class="posts-grid">
 					{filteredPosts.map(({ post, tags }) => (
@@ -74,7 +67,7 @@ const filteredPosts = posts.map((post) => ({
 							title={post.data.title}
 							excerpt={post.data.excerpt}
 							featuredImage={post.data.featured_image}
-							href={localized(`/posts/${post.id}`)}
+							href={`/posts/${post.id}`}
 							date={post.data.publishedAt ?? undefined}
 							readingTime={getReadingTime(post.data.content)}
 							tags={tags.map((t) => ({ slug: t.slug, label: t.label }))}
@@ -85,13 +78,13 @@ const filteredPosts = posts.map((post) => ({
 			)
 		}
 		<nav class="pagination" aria-label="Pagination">
-			{cursor && <a href={localized(`/category/${term.slug}`)}>{t("First page", "Primera página")}</a>}
+			{cursor && <a href={`/category/${term.slug}`}>First page</a>}
 			{
 				nextCursor && (
 					<a
-						href={localized(`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`)}
+						href={`/category/${term.slug}?cursor=${encodeURIComponent(nextCursor)}`}
 					>
-						{t("Next page", "Página siguiente")}
+						Next page
 					</a>
 				)
 			}

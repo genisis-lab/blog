@@ -1,26 +1,23 @@
 ---
 import Base from "../layouts/Base.astro";
-import { blogLocale, uiText } from "../utils/i18n";
-const locale = blogLocale(Astro.currentLocale);
-const t = (en: string, es: string) => uiText(locale, en, es);
 ---
-<Base title={t("Contact", "Contacto")} description={t("Send a message to Built WAI.", "Envía un mensaje a Built WAI.")}>
+<Base title={"Contact"} description={"Send a message to Built WAI."}>
 	<section class="contact-page">
-		<h1>{t("Contact", "Contacto")}</h1>
+		<h1>{"Contact"}</h1>
 		<form id="contact-form" data-form-id="eafb5899-592b-4e5c-bd26-7c461b430e35"
 			data-endpoint="/_emdash/api/plugins/r_hslxqt6ipu64hubq/submit"
-			data-error={t("Please check the fields or try again later.", "Revisa los campos o inténtalo de nuevo más tarde.")}
-			data-success={t("Thanks for your message. Your submission has been received.", "Gracias por tu mensaje. Hemos recibido tu envío.")}>
-			<label for="contact-name">{t("Name", "Nombre")}</label>
+			data-error={"Please check the fields or try again later."}
+			data-success={"Thanks for your message. Your submission has been received."}>
+			<label for="contact-name">{"Name"}</label>
 			<input id="contact-name" name="name" autocomplete="name" maxlength="100" required />
-			<label for="contact-email">{t("Email", "Correo electrónico")}</label>
+			<label for="contact-email">{"Email"}</label>
 			<input id="contact-email" name="email" type="email" autocomplete="email" maxlength="254" required />
-			<label for="contact-message">{t("Message", "Mensaje")}</label>
+			<label for="contact-message">{"Message"}</label>
 			<textarea id="contact-message" name="message" rows="7" maxlength="10000" required></textarea>
 			<input name="_hp" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" class="contact-honeypot" />
-			<button type="submit" disabled>{t("Send message", "Enviar mensaje")}</button>
+			<button type="submit" disabled>{"Send message"}</button>
 			<p class="contact-status" role="status" aria-live="polite"></p>
-			<noscript><p>{t("Enable JavaScript to submit this form.", "Activa JavaScript para enviar este formulario.")}</p></noscript>
+			<noscript><p>{"Enable JavaScript to submit this form."}</p></noscript>
 		</form>
 	</section>
 </Base>

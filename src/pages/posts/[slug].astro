@@ -1,5 +1,4 @@
 ---
-import { blogLocale, localizePath, uiText } from "../../utils/i18n";
 import {
 	getEmDashEntry,
 	getEmDashCollection,
@@ -15,17 +14,13 @@ import PostCard from "../../components/PostCard.astro";
 import { getReadingTime } from "../../utils/reading-time";
 import { resolveBlogSiteIdentity } from "../../utils/site-identity";
 
-const locale = blogLocale(Astro.currentLocale);
-const localized = (path: string) => localizePath(path, locale);
-const t = (en: string, es: string) => uiText(locale, en, es);
-
 const slug = decodeSlug(Astro.params.slug);
 
 if (!slug) {
 	return Astro.redirect("/404");
 }
 
-const { entry: post, cacheHint, fallbackLocale } = await getEmDashEntry("posts", slug, { locale });
+const { entry: post, cacheHint } = await getEmDashEntry("posts", slug);
 
 if (!post) {
 	return Astro.redirect("/404");
@@ -79,7 +74,6 @@ const tags = post.data.terms?.tag ?? [];
 const { entries: recentPosts, cacheHint: recentPostsCacheHint } = await getEmDashCollection(
 	"posts",
 	{
-	locale,
 	orderBy: { published_at: "desc" },
 	limit: 4,
 	},
@@ -101,7 +95,7 @@ const otherPostsWithTags = otherPosts.map((p) => ({
 }));
 
 const publishDate =
-	post.data.publishedAt?.toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
+	post.data.publishedAt?.toLocaleDateString("en-US", {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
@@ -120,8 +114,7 @@ const publishDate =
 	modifiedTime={post.data.updatedAt.toISOString()}
 	content={{ collection: "posts", id: post.data.id, slug }}
 >
-	{fallbackLocale && <p class="translation-notice">{t("This translation is unavailable. Showing the English version.", "Esta traducción aún no está disponible. Se muestra la versión en inglés.")}</p>}
-	<article lang={fallbackLocale ?? locale} class="article">
+	<article class="article">
 		{/* Hero: Full-width featured image */}
 		{
 			post.data.featured_image && (
@@ -169,22 +162,22 @@ const publishDate =
 					{
 						publishDate && (
 							<div class="meta-block">
-								<span class="meta-label">{t("Published", "Publicado")}</span>
+								<span class="meta-label">Published</span>
 								<time class="meta-value">{publishDate}</time>
 							</div>
 						)
 					}
 					<div class="meta-block">
-						<span class="meta-label">{t("Reading time", "Tiempo de lectura")}</span>
+						<span class="meta-label">Reading time</span>
 						<span class="meta-value">{readingTime} min</span>
 					</div>
 					{
 						tags.length > 0 && (
 							<div class="meta-block">
-								<span class="meta-label">{t("Tags", "Etiquetas")}</span>
+								<span class="meta-label">Tags</span>
 								<div class="meta-tags">
 									{tags.map((t) => (
-										<a href={localized(`/tag/${t.slug}`)} class="meta-tag">
+										<a href={`/tag/${t.slug}`} class="meta-tag">
 											{t.label}
 										</a>
 									))}
@@ -222,7 +215,7 @@ const publishDate =
 								</>
 							)
 						}
-						<span>{readingTime} {t("min read", "min de lectura")}</span>
+						<span>{readingTime} min read</span>
 					</div>
 					<h1 class="article-title" {...post.edit.title}>{post.data.title}</h1>
 					{
@@ -248,7 +241,7 @@ const publishDate =
 			<aside class="article-sidebar">
 				<div class="sidebar-sticky">
 					<nav class="toc" aria-label="Table of contents">
-						<h2 class="toc-title">{t("On this page", "En esta página")}</h2>
+						<h2 class="toc-title">On this page</h2>
 						<div class="toc-content" id="toc-content">
 							<!-- Populated by JS -->
 						</div>
@@ -265,7 +258,7 @@ const publishDate =
 		otherPostsWithTags.length > 0 && (
 			<section class="more-posts">
 				<div class="more-inner">
-					<h2 class="more-title">{t("Continue reading", "Sigue leyendo")}</h2>
+					<h2 class="more-title">Continue reading</h2>
 					<div class="more-grid">
 						{otherPostsWithTags.map(
 							({ post: p, tags: postTags, bylines: postBylines }) => (
@@ -273,7 +266,7 @@ const publishDate =
 									title={p.data.title}
 									excerpt={p.data.excerpt}
 									featuredImage={p.data.featured_image}
-									href={localized(`/posts/${p.id}`)}
+									href={`/posts/${p.id}`}
 									date={p.data.publishedAt ?? undefined}
 									readingTime={getReadingTime(p.data.content)}
 									tags={postTags.map((t) => ({ slug: t.slug, label: t.label }))}

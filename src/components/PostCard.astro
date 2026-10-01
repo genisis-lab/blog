@@ -1,10 +1,6 @@
 ---
-import { blogLocale, localizePath } from "../utils/i18n";
 import type { ContentBylineCredit, EditProxy, MediaValue } from "emdash";
 import { Image } from "emdash/ui";
-
-const locale = blogLocale(Astro.currentLocale);
-const localized = (path: string) => localizePath(path, locale);
 
 interface Props {
 	title: string;
@@ -31,7 +27,7 @@ const {
 } = Astro.props;
 
 const formattedDate = date
-	? date.toLocaleDateString(locale === "es" ? "es-ES" : "en-US", {
+	? date.toLocaleDateString("en-US", {
 			year: "numeric",
 			month: "short",
 			day: "numeric",
@@ -103,7 +99,7 @@ const formattedDate = date
 		tags && tags.length > 0 && (
 			<div class="card-tags">
 				{tags.slice(0, 2).map((tag) => (
-					<a href={localized(`/tag/${tag.slug}`)} class="card-tag">
+					<a href={`/tag/${tag.slug}`} class="card-tag">
 						{tag.label}
 					</a>
 				))}

@@ -6,32 +6,13 @@ import emdash from "emdash/astro";
 
 export default defineConfig({
 	output: "server",
-	i18n: { defaultLocale: "en", locales: ["en", "es"], fallback: { es: "en" } },
+
 	adapter: cloudflare(),
 	image: {
 		layout: "constrained",
 		responsiveStyles: true,
 	},
 	integrations: [
-		{
-			name: "blog-spanish-routes",
-			hooks: {
-				"astro:config:setup": ({ injectRoute }) => {
-					// Share server-rendered templates across languages.
-					for (const [pattern, page] of [
-						["/es", "index.astro"],
-						["/es/posts", "posts/index.astro"],
-						["/es/posts/[slug]", "posts/[slug].astro"],
-						["/es/pages/[slug]", "pages/[slug].astro"],
-						["/es/category/[slug]", "category/[slug].astro"],
-						["/es/tag/[slug]", "tag/[slug].astro"],
-						["/es/search", "search.astro"],
-						["/es/contact", "contact.astro"],
-						["/es/newsletter", "newsletter.astro"],
-					]) injectRoute({ pattern, entrypoint: `./src/pages/${page}`, prerender: false });
-				},
-			},
-		},
 		react(),
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
