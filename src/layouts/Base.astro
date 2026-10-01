@@ -912,5 +912,13 @@ const isLoggedIn = !!Astro.locals.user;
 		</script>
 		<WebMcpSearch collections={["posts", "pages"]} locale="en" routeMap={routeMap} />
 		<EmDashBodyEnd page={pageCtx} />
+		{Astro.url.hostname === "blog.builtwai.com" && (
+			<script
+				is:inline
+				type="module"
+				src="https://static.cloudflareinsights.com/beacon.min.js"
+				data-cf-beacon='{"token":"8e5ac741ecda41c690ec8c1fc3bea14e"}'
+			></script>
+		)}
 	</body>
 </html>
