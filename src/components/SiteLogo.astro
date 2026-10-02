@@ -1,0 +1,68 @@
+---
+/**
+ * Built WAI logo: a "b" tile with a pixel spark, plus the wordmark.
+ * Inline so it follows the theme tokens (light/dark) with no image request.
+ */
+interface Props {
+	label: string;
+	class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<span class:list={["site-logo", className]} role="img" aria-label={label}>
+	<svg class="site-logo-mark" viewBox="0 0 32 32" aria-hidden="true">
+		<rect class="site-logo-tile" width="32" height="32" rx="8"></rect>
+		<rect class="site-logo-ink" x="7" y="6" width="4" height="20" rx="1"></rect>
+		<circle class="site-logo-bowl" cx="16" cy="19" r="5" fill="none" stroke-width="4"></circle>
+		<rect class="site-logo-ink" x="20" y="5" width="5" height="5" rx="1"></rect>
+	</svg>
+	<span class="site-logo-word" aria-hidden="true">built<span>wai</span></span>
+</span>
+
+<style>
+	.site-logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		font-family: var(--font-body);
+		font-size: 1.375rem;
+		font-weight: 700;
+		letter-spacing: -0.045em;
+		line-height: 1;
+		color: var(--color-text);
+	}
+
+	.site-logo-mark {
+		width: 1.35em;
+		height: 1.35em;
+		flex: none;
+	}
+
+	.site-logo-tile {
+		fill: var(--color-brand);
+	}
+
+	.site-logo-ink {
+		fill: var(--color-on-brand);
+	}
+
+	.site-logo-bowl {
+		stroke: var(--color-on-brand);
+	}
+
+	.site-logo-word span {
+		color: var(--color-brand);
+	}
+
+	@media (max-width: 640px) {
+		.site-logo {
+			font-size: 1.2rem;
+		}
+	}
+
+	.site-logo.site-logo--footer {
+		font-size: 1.125rem;
+	}
+</style>
