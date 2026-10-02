@@ -8,6 +8,23 @@ export function isPublicReadingRequest(request: Request): boolean {
 	return /^\/(?:posts\/?|(?:posts|pages|category|tag)\/[^/]+\/?|)$/.test(url.pathname);
 }
 
+/** EmDash media files and Astro's image-transform endpoint (featured images, avatars). */
+const MEDIA_PATH = /^\/(?:_image\/?|_emdash\/api\/media\/file\/[^/]+)$/;
+/**
+ * EmDash serves images as `max-age=0, must-revalidate` because "Replace
+ * original" can overwrite a key, so every view re-ran the R2 read and image
+ * transform. A day of caching bounds how long a replaced image can linger.
+ */
+export const MEDIA_CACHE_CONTROL = "public, max-age=86400, stale-while-revalidate=604800";
+
+function isPublicMediaResponse(request: Request, response: Response): boolean {
+	if (request.method !== "GET" && request.method !== "HEAD") return false;
+	if (!MEDIA_PATH.test(new URL(request.url).pathname)) return false;
+	return response.status === 200
+		&& /\bpublic\b/i.test(response.headers.get("Cache-Control") ?? "")
+		&& !response.headers.has("Set-Cookie");
+}
+
 type CacheContext = {
 	request: Request;
 	locals: { user?: unknown };
@@ -16,6 +33,14 @@ type CacheContext = {
 
 export function applyPublicCachePolicy(context: CacheContext, response: Response): Response {
 	const existing = response.headers.get("Cache-Control") ?? "";
+	if (isPublicMediaResponse(context.request, response)) {
+		// Already-public media keeps its policy; only lift the revalidate-every-view default.
+		if (/\bmax-age=0\b/.test(existing)) {
+			response.headers.set("Cache-Control", MEDIA_CACHE_CONTROL);
+			response.headers.set("Cloudflare-CDN-Cache-Control", MEDIA_CACHE_CONTROL);
+		}
+		return response;
+	}
 	const shared = isPublicReadingRequest(context.request)
 		&& !context.locals.user
 		&& response.status === 200

@@ -46,8 +46,9 @@ A clean, minimal blog built with [EmDash](https://github.com/emdash-cms/emdash) 
 ## Public-page caching
 
 Astro's `cacheCloudflare()` provider enables Workers Cache for the deployed
-blog. Homepage, post, page, category, and tag routes use a five-minute edge
-lifetime with a one-minute stale-while-revalidate window. EmDash query cache
+blog. Homepage, post, page, category, and tag routes are fresh for five
+minutes, then served from cache for up to a day while they refresh in the
+background. EmDash query cache
 hints attach content, settings, menu, and taxonomy tags for invalidation on
 editorial changes. The existing KV object cache remains enabled.
 
@@ -56,6 +57,8 @@ Authenticated or cookie-setting renders, previews, edit views, APIs, forms,
 search, and non-success responses explicitly opt out of the shared cache.
 The client toolbar supports editing when an anonymous public page is cached.
 Fingerprinted assets under `/_astro/` retain the adapter's immutable headers.
+EmDash media files and `/_image` transforms are cached for a day in browsers
+and at the edge instead of being re-read from R2 and re-transformed per view.
 
 The GitHub checks run cache-policy tests, Astro typechecking, and a production
 build before deployment. Theme overrides live in `src/styles/theme.css`.

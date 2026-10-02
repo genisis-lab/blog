@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { applyPublicCachePolicy } from "../src/utils/cache-policy.ts";
+import { applyPublicCachePolicy, MEDIA_CACHE_CONTROL } from "../src/utils/cache-policy.ts";
 
 function render(path: string, options: {
 	method?: string; user?: unknown; headers?: Record<string, string>;
@@ -56,4 +56,28 @@ test("private and cookie-setting renders cannot retain public CDN headers", () =
 		assert.equal(response.headers.get("Cache-Control"), "private, no-store");
 		assert.equal(response.headers.has("Cache-Tag"), false);
 	}
+});
+
+test("public media and image transforms are cached instead of refetched every view", () => {
+	const mutable = { "Content-Type": "image/webp", "Cache-Control": "public, max-age=0, must-revalidate" };
+	for (const path of ["/_image?href=%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01ABC.png&w=960", "/_emdash/api/media/file/01ABC.png"]) {
+		const { disabled, response } = render(path, { responseHeaders: mutable, headers: { Cookie: "theme=dark" } });
+		assert.equal(disabled, false, path);
+		assert.equal(response.headers.get("Cache-Control"), MEDIA_CACHE_CONTROL, path);
+		assert.equal(response.headers.get("Cloudflare-CDN-Cache-Control"), MEDIA_CACHE_CONTROL, path);
+	}
+	const immutable = "public, max-age=31536000, immutable";
+	const pdf = render("/_emdash/api/media/file/01ABC.pdf", { responseHeaders: { "Cache-Control": immutable } }).response;
+	assert.equal(pdf.headers.get("Cache-Control"), immutable);
+});
+
+test("media stays private when it is not a public success response", () => {
+	for (const options of [
+		{ status: 404, responseHeaders: { "Cache-Control": "public, max-age=0" } },
+		{ responseHeaders: { "Cache-Control": "private, no-store" } },
+		{ responseHeaders: { "Cache-Control": "public, max-age=0", "Set-Cookie": "session=test" } },
+		{ method: "POST", responseHeaders: { "Cache-Control": "public, max-age=0" } },
+	]) assert.equal(render("/_emdash/api/media/file/01ABC.png", options).response.headers.get("Cache-Control"), "private, no-store");
+	for (const path of ["/_emdash/api/media", "/_emdash/api/media/01ABC", "/_emdash/api/media/file/a/b"])
+		assert.equal(render(path, { responseHeaders: { "Cache-Control": "public, max-age=0" } }).disabled, true, path);
 });

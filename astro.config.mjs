@@ -11,13 +11,15 @@ export default defineConfig({
 	adapter: cloudflare(),
 	cache: { provider: cacheCloudflare() },
 	// Cache finished public pages; EmDash query hints provide invalidation tags.
+	// After 5 min, serve the cached copy instantly for up to a day while it refreshes
+	// in the background; admin edits still purge by tag immediately.
 	routeRules: {
-		"/": { maxAge: 300, swr: 60 },
-		"/posts": { maxAge: 300, swr: 60 },
-		"/posts/[slug]": { maxAge: 300, swr: 60 },
-		"/pages/[slug]": { maxAge: 300, swr: 60 },
-		"/category/[slug]": { maxAge: 300, swr: 60 },
-		"/tag/[slug]": { maxAge: 300, swr: 60 },
+		"/": { maxAge: 300, swr: 86400 },
+		"/posts": { maxAge: 300, swr: 86400 },
+		"/posts/[slug]": { maxAge: 300, swr: 86400 },
+		"/pages/[slug]": { maxAge: 300, swr: 86400 },
+		"/category/[slug]": { maxAge: 300, swr: 86400 },
+		"/tag/[slug]": { maxAge: 300, swr: 86400 },
 	},
 	image: {
 		layout: "constrained",
