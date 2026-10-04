@@ -23,6 +23,12 @@
 		{ "binding": "CACHE", "id": "de926f9bc18443ecad2630e57e6daa40" },
 		{ "binding": "SESSION", "id": "222f4158926842369755a2286ea0b096" },
 	],
+	// Keep preview sessions separate from production authentication.
+	"previews": {
+		"kv_namespaces": [
+			{ "binding": "SESSION", "id": "2201525fdf414516a1c43e556579bf7a" },
+		],
+	},
 	// Run registry plugins in isolated Dynamic Workers.
 	"worker_loaders": [{ "binding": "LOADER" }],
 	// General maintenance cron trigger
