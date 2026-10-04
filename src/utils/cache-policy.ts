@@ -18,10 +18,12 @@ const MEDIA_PATH = /^\/(?:_image\/?|_emdash\/api\/media\/file\/[^/]+)$/;
 export const MEDIA_CACHE_CONTROL = "public, max-age=86400, stale-while-revalidate=604800";
 
 function isPublicMediaResponse(request: Request, response: Response): boolean {
+	if (request.headers.has("Authorization")) return false;
 	if (request.method !== "GET" && request.method !== "HEAD") return false;
 	if (!MEDIA_PATH.test(new URL(request.url).pathname)) return false;
 	return response.status === 200
 		&& /\bpublic\b/i.test(response.headers.get("Cache-Control") ?? "")
+		&& !/\b(?:private|no-store)\b/i.test(response.headers.get("Cache-Control") ?? "")
 		&& !response.headers.has("Set-Cookie");
 }
 
@@ -33,7 +35,7 @@ type CacheContext = {
 
 export function applyPublicCachePolicy(context: CacheContext, response: Response): Response {
 	const existing = response.headers.get("Cache-Control") ?? "";
-	if (isPublicMediaResponse(context.request, response)) {
+	if (!context.locals.user && isPublicMediaResponse(context.request, response)) {
 		// Already-public media keeps its policy; only lift the revalidate-every-view default.
 		if (/\bmax-age=0\b/.test(existing)) {
 			response.headers.set("Cache-Control", MEDIA_CACHE_CONTROL);
