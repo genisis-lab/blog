@@ -4,6 +4,7 @@ import react from "@astrojs/react";
 import { d1, r2, sandbox, kvCache } from "@emdash-cms/cloudflare";
 import { defineConfig, fontProviders } from "astro/config";
 import emdash from "emdash/astro";
+import { fileURLToPath } from "node:url";
 
 export default defineConfig({
 	output: "server",
@@ -30,7 +31,9 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
-			sandboxRunner: sandbox(),
+			sandboxRunner: sandbox()
+				? fileURLToPath(new URL("./src/plugin-sandbox.ts", import.meta.url))
+				: undefined,
 			objectCache: kvCache({ binding: "CACHE" }),
 			toolbar: "client",
 			middleware: { outer: "./src/cache-middleware.ts" },
