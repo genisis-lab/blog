@@ -31,6 +31,13 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
+			plugins: [{
+				id: "builtwai-email",
+				version: "1.0.0",
+				format: "native",
+				entrypoint: fileURLToPath(new URL("./src/plugins/site-email.ts", import.meta.url)),
+				capabilities: ["hooks.email-transport:register"],
+			}],
 			sandboxRunner: sandbox()
 				? fileURLToPath(new URL("./src/plugin-sandbox.ts", import.meta.url))
 				: undefined,

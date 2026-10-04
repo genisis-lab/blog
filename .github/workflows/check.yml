@@ -16,6 +16,6 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: node --experimental-strip-types --test tests/cache-policy.test.ts
+      - run: node --experimental-strip-types --test tests/*.test.ts
       - run: pnpm typecheck
       - run: pnpm build
