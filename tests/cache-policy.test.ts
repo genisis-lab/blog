@@ -81,3 +81,17 @@ test("media stays private when it is not a public success response", () => {
 	for (const path of ["/_emdash/api/media", "/_emdash/api/media/01ABC", "/_emdash/api/media/file/a/b"])
 		assert.equal(render(path, { responseHeaders: { "Cache-Control": "public, max-age=0" } }).disabled, true, path);
 });
+
+
+test("media never overrides authenticated or restrictive cache responses", () => {
+	for (const options of [
+		{ user: { email: "editor@example.test" }, responseHeaders: { "Cache-Control": "public, max-age=0" } },
+		{ headers: { Authorization: "Bearer test" }, responseHeaders: { "Cache-Control": "public, max-age=0" } },
+		{ responseHeaders: { "Cache-Control": "public, no-store, max-age=0" } },
+		{ responseHeaders: { "Cache-Control": "public, private, max-age=0" } },
+	]) {
+		const { response, disabled } = render("/_emdash/api/media/file/image.png", options);
+		assert.equal(disabled, true);
+		assert.equal(response.headers.get("Cloudflare-CDN-Cache-Control"), "private, no-store");
+	}
+});
