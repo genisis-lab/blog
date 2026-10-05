@@ -1,6 +1,6 @@
-import handler, { createScheduledHandler, PluginBridge } from "@emdash-cms/cloudflare/worker";
+import handler, { createScheduledHandler } from "@emdash-cms/cloudflare/worker";
 
-export { PluginBridge };
+export { PluginBridge } from "./plugin-bridge";
 
 export default {
 	...handler,

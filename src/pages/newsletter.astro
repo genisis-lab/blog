@@ -10,10 +10,17 @@ try {
 } catch { ready = false; }
 // The form must reflect credential changes without HTML cache reuse.
 Astro.response.headers.set("Cache-Control", "no-store");
+const notices: Record<string, string> = {
+	pending: "Check your email and confirm your subscription.",
+	confirmed: "Your subscription is confirmed. Welcome to the Built WAI newsletter.",
+	unsubscribed: "You have been unsubscribed from the Built WAI newsletter.",
+};
+const notice = notices[Astro.url.searchParams.get("bulletin") ?? ""] ?? "";
 ---
 <Base title={"Newsletter"}>
 	<section class="contact-page">
 		<h1>{"Newsletter"}</h1>
+		{notice && <p role="status">{notice}</p>}
 		{ready ? (
 			<form id="newsletter-form" action="/_emdash/api/plugins/r_nqufahfpg3jo7lbq/subscribe" method="post"
 				data-error={"Your signup could not be completed. Please try again later."}
@@ -24,6 +31,7 @@ Astro.response.headers.set("Cache-Control", "no-store");
 				<input id="newsletter-email" name="email" type="email" autocomplete="email" maxlength="254" required />
 				<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="contact-honeypot" />
 				<input type="hidden" name="source" value="newsletter-page" />
+				<input type="hidden" name="redirect" value="/newsletter" />
 				<button type="submit">{"Subscribe"}</button>
 				<p class="contact-status" role="status" aria-live="polite"></p>
 			</form>
@@ -45,9 +53,9 @@ Astro.response.headers.set("Cache-Control", "no-store");
 					method: "POST", headers: { Accept: "application/json" }, body: new FormData(form),
 				});
 				const result = await response.json();
-			if (!response.ok || typeof result !== "object" || result === null
-				|| !("ok" in result) || result.ok !== true || !("status" in result)
-				|| (result.status !== "already_confirmed" && (!("emailSent" in result) || result.emailSent !== true))) throw new Error("Signup failed");
+				if (!response.ok || typeof result !== "object" || result === null
+					|| !("ok" in result) || result.ok !== true || !("status" in result)
+					|| (result.status !== "already_confirmed" && (!("emailSent" in result) || result.emailSent !== true))) throw new Error("Signup failed");
 				status.textContent = result.status === "already_confirmed" ? form.dataset.confirmed! : form.dataset.success!;
 				form.reset();
 			} catch { status.textContent = form.dataset.error!; }
