@@ -1,0 +1,50 @@
+diff --git a/dist/api-DBw_IWoi.mjs b/dist/api-DBw_IWoi.mjs
+index 9ee58c659acba6ac4390dd6079f0261cd20bdc3f..1292fd854327a2c4aea9daef9a12edc6c1f7a9a4 100644
+--- a/dist/api-DBw_IWoi.mjs
++++ b/dist/api-DBw_IWoi.mjs
+@@ -2962,15 +2962,17 @@ async function streamToText(stream) {
+ * `registry/<id>/<version>/`. Defaults to `"marketplace"` for
+ * backwards compatibility with pre-registry call sites.
+ */
+-async function loadBundleFromR2(storage, pluginId, version, source = "marketplace") {
++async function loadBundleFromR2(storage, pluginId, version, source = "marketplace", includeAdmin = true) {
+ 	validatePluginIdentifier(pluginId, "plugin ID");
+ 	validateVersion(version);
+ 	const prefix = bundlePrefix(source, pluginId, version);
+ 	try {
+-		const manifestResult = await storage.download(`${prefix}/manifest.json`);
+-		const backendResult = await storage.download(`${prefix}/backend.js`);
+-		const manifestText = await streamToText(manifestResult.body);
+-		const backendCode = await streamToText(backendResult.body);
++		// Consume each body as it arrives so neither read holds an open R2 stream.
++		const readText = async (file) => streamToText((await storage.download(`${prefix}/${file}`)).body);
++		const [manifestText, backendCode] = await Promise.all([
++			readText("manifest.json"),
++			readText("backend.js")
++		]);
+ 		const parsed = JSON.parse(manifestText);
+ 		const result = pluginManifestSchema$1.safeParse(parsed);
+ 		if (!result.success) return null;
+@@ -2978,7 +2980,7 @@ async function loadBundleFromR2(storage, pluginId, version, source = "marketplac
+ 		warnDeprecatedPluginCapabilities(manifest.id, manifest.capabilities);
+ 		let adminCode;
+ 		try {
+-			adminCode = await streamToText((await storage.download(`${prefix}/admin.js`)).body);
++			if (includeAdmin) adminCode = await streamToText((await storage.download(`${prefix}/admin.js`)).body);
+ 		} catch {}
+ 		return {
+ 			manifest,
+diff --git a/dist/emdash-runtime-C4oFeVpN.mjs b/dist/emdash-runtime-C4oFeVpN.mjs
+index aa2147dfcfeaa96fd712e460098920a9a2bc432b..609ed38031b2528acb0944d40ce2d58e424129c9 100644
+--- a/dist/emdash-runtime-C4oFeVpN.mjs
++++ b/dist/emdash-runtime-C4oFeVpN.mjs
+@@ -2260,7 +2260,8 @@ var EmDashRuntime = class EmDashRuntime {
+ 				const pluginKey = `${plugin.pluginId}:${version}`;
+ 				if (cache.has(pluginKey)) continue;
+ 				try {
+-					const bundle = await loadBundleFromR2(storage, plugin.pluginId, version, source);
++					// Startup only needs the manifest and backend; admin assets load on demand.
++					const bundle = await loadBundleFromR2(storage, plugin.pluginId, version, source, false);
+ 					if (!bundle) {
+ 						console.warn(`EmDash: ${source} plugin ${plugin.pluginId}@${version} not found in R2`);
+ 						continue;

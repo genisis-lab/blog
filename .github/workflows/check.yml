@@ -17,5 +17,6 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: node --experimental-strip-types --test tests/*.test.ts
+      - run: node scripts/profile-plugin-startup.mjs
       - run: pnpm typecheck
       - run: pnpm build

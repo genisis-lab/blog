@@ -13,3 +13,5 @@ minimumReleaseAgeExclude:
   - emdash
   - "@emdash-cms/*"
 blockExoticSubdeps: true
+patchedDependencies:
+  emdash@1.2.0: patches/emdash@1.2.0.patch
